@@ -1,9 +1,6 @@
 package com.example.minitc;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -74,7 +71,7 @@ public class HttpResponse {
      *
      * @throws IOException 입출력 오류 발생 시
      */
-    public void send() throws IOException {
+    public void oldsend() throws IOException {
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
         pw.printf("HTTP/1.1 %d %s\r\n",status,reason(status));
         for(var e : headers.entrySet()){
@@ -84,6 +81,19 @@ public class HttpResponse {
         pw.flush();
         out.write(body);
         out.flush();
+    }
+
+    public void send() throws IOException {
+        BufferedOutputStream bos = new BufferedOutputStream(out);
+        StringBuilder sb = new StringBuilder();
+        sb.append("HTTP/1.1 ").append(status).append(" ").append(reason(status)).append("\r\n");
+        for(var e : headers.entrySet()){
+            sb.append(e.getKey()).append(": ").append(e.getValue()).append("\r\n");
+        }
+        sb.append("\r\n");
+        bos.write(sb.toString().getBytes(StandardCharsets.US_ASCII));
+        bos.write(body);
+        bos.flush();
     }
 
     /**

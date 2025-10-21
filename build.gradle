@@ -1,0 +1,43 @@
+// build.gradle  (Groovy DSL)
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.example'
+version = '0.1.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17) // 17~21 아무거나 OK
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+application {
+    // 실행 진입점 (패키지명 포함)
+    mainClass = 'com.example.minitc.MiniTomcat'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// 맨 아래쪽에 추가
+tasks.named('run', JavaExec) {
+    // Gradle에 들어온 -D 값을 애플리케이션 JVM으로 넘김
+    systemProperty 'port',    System.getProperty('port', '8080')
+    systemProperty 'docRoot', System.getProperty('docRoot', 'public')
+}
